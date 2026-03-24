@@ -19,14 +19,6 @@ import { LoggerModule } from './common/logger';
 import { SentryModule } from './common/sentry';
 import { CacheModule } from './cache/cache.module';
 import { AuthModule } from './auth/auth.module';
- api
-import { AnalyticsModule } from './analytics/analytics.module';
-import { WebsocketModule } from './websocket/websocket.module';
-import { ApiMonetizationModule } from './api-monetization/api-monetization.module';
-Management
-import { SlaModule } from './enterprise/sla/sla.module';
-=======
-=======
 import { UsersModule } from './users/users.module';
 import { SignalsModule } from './signals/signals.module';
 import { TradesModule } from './trades/trades.module';
@@ -46,8 +38,7 @@ import { KycModule } from './kyc/kyc.module';
 import { ProductAnalyticsModule } from './analytics/product-analytics.module';
 import { BackupModule } from './backup/backup.module';
 import { AdminAnalyticsModule } from './admin/analytics/admin-analytics.module';
-main
-main
+import { Sep24Module } from './anchors/sep24/sep24.module';
 
 @Module({
   imports: [
@@ -128,13 +119,6 @@ main
     TradesModule,
     CacheModule,
     AuthModule,
- api
-    WebsocketModule,
-    ApiMonetizationModule,
- Management
-    SlaModule,
-=======
-=======
     ProvidersModule,
     MlModule,
     ScalingModule,
@@ -149,8 +133,7 @@ main
     ProductAnalyticsModule,
     BackupModule,
     AdminAnalyticsModule,
- main
-main
+    Sep24Module,
   ],
   providers: [StellarConfigService],
   exports: [StellarConfigService],
