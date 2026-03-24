@@ -23,18 +23,11 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { WebsocketModule } from './websocket/websocket.module';
 import { ApiMonetizationModule } from './api-monetization/api-monetization.module';
 import { SlaModule } from './enterprise/sla/sla.module';
- api
-import { AnalyticsModule } from './analytics/analytics.module';
-import { WebsocketModule } from './websocket/websocket.module';
-import { ApiMonetizationModule } from './api-monetization/api-monetization.module';
-Management
-import { SlaModule } from './enterprise/sla/sla.module';
 import { UsersModule } from './users/users.module';
 import { SignalsModule } from './signals/signals.module';
 import { TradesModule } from './trades/trades.module';
 import { ProvidersModule } from './providers/providers.module';
 import { MlModule } from './ml/ml.module';
-// import { ValidationModule } from './common/validation/validation.module';
 import { ScalingModule } from './scaling/scaling.module';
 import { VersioningModule } from './common/modules/versioning.module';
 import { ReferralsModule } from './referrals/referrals.module';
@@ -48,8 +41,7 @@ import { KycModule } from './kyc/kyc.module';
 import { ProductAnalyticsModule } from './analytics/product-analytics.module';
 import { BackupModule } from './backup/backup.module';
 import { AdminAnalyticsModule } from './admin/analytics/admin-analytics.module';
-main
-main
+import { MonitoringModule } from './monitoring/monitoring.module';
 
 @Module({
   imports: [
@@ -104,25 +96,17 @@ main
         migrations: ['dist/migrations/*{.ts,.js}'],
         subscribers: ['dist/subscribers/*{.ts,.js}'],
         ssl: configService.get<boolean>('database.ssl') ?? false,
-        // Connection Pool Configuration (min: 10, max: 30 for 10k+ users)
         extra: {
           min: parseInt(process.env.DATABASE_POOL_MIN || '10', 10),
           max: parseInt(process.env.DATABASE_POOL_MAX || '30', 10),
-          idleTimeoutMillis: parseInt(
-            process.env.DATABASE_POOL_IDLE_TIMEOUT || '30000',
-            10,
-          ),
-          connectionTimeoutMillis: parseInt(
-            process.env.DATABASE_POOL_CONNECTION_TIMEOUT || '2000',
-            10,
-          ),
+          idleTimeoutMillis: parseInt(process.env.DATABASE_POOL_IDLE_TIMEOUT || '30000', 10),
+          connectionTimeoutMillis: parseInt(process.env.DATABASE_POOL_CONNECTION_TIMEOUT || '2000', 10),
         },
       }),
     }),
 
     EventEmitterModule.forRoot(),
 
-    // DatabaseOptimizationModule,
     LoggerModule,
     SentryModule,
     UsersModule,
@@ -130,13 +114,9 @@ main
     TradesModule,
     CacheModule,
     AuthModule,
+    AnalyticsModule,
     WebsocketModule,
     ApiMonetizationModule,
-    SlaModule,
- api
-    WebsocketModule,
-    ApiMonetizationModule,
- Management
     SlaModule,
     ProvidersModule,
     MlModule,
@@ -152,8 +132,7 @@ main
     ProductAnalyticsModule,
     BackupModule,
     AdminAnalyticsModule,
- main
-main
+    MonitoringModule,
   ],
   providers: [StellarConfigService],
   exports: [StellarConfigService],
