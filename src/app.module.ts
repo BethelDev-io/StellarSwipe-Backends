@@ -19,14 +19,16 @@ import { LoggerModule } from './common/logger';
 import { SentryModule } from './common/sentry';
 import { CacheModule } from './cache/cache.module';
 import { AuthModule } from './auth/auth.module';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { WebsocketModule } from './websocket/websocket.module';
+import { ApiMonetizationModule } from './api-monetization/api-monetization.module';
+import { SlaModule } from './enterprise/sla/sla.module';
  api
 import { AnalyticsModule } from './analytics/analytics.module';
 import { WebsocketModule } from './websocket/websocket.module';
 import { ApiMonetizationModule } from './api-monetization/api-monetization.module';
 Management
 import { SlaModule } from './enterprise/sla/sla.module';
-=======
-=======
 import { UsersModule } from './users/users.module';
 import { SignalsModule } from './signals/signals.module';
 import { TradesModule } from './trades/trades.module';
@@ -47,8 +49,7 @@ import { ProductAnalyticsModule } from './analytics/product-analytics.module';
 import { BackupModule } from './backup/backup.module';
 import { AdminAnalyticsModule } from './admin/analytics/admin-analytics.module';
 import { RecommendationsModule } from './recommendations/recommendations.module';
-main
-main
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -129,13 +130,14 @@ main
     TradesModule,
     CacheModule,
     AuthModule,
+    WebsocketModule,
+    ApiMonetizationModule,
+    SlaModule,
  api
     WebsocketModule,
     ApiMonetizationModule,
  Management
     SlaModule,
-=======
-=======
     ProvidersModule,
     MlModule,
     ScalingModule,
@@ -151,8 +153,7 @@ main
     BackupModule,
     AdminAnalyticsModule,
     RecommendationsModule,
- main
-main
+    SearchModule,
   ],
   providers: [StellarConfigService],
   exports: [StellarConfigService],
