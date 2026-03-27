@@ -88,5 +88,53 @@ export function matchPatterns(
     });
   }
 
+  const worstHourData = timing.tradesByHour[timing.worstHour];
+  if (worstHourData?.avgPnl < 0) {
+    insights.push({
+      insightType: InsightType.WEAKNESS,
+      title: 'Suboptimal Trading Hour',
+      description: `You tend to lose most at UTC hour ${timing.worstHour} with avg loss ${Math.abs(worstHourData.avgPnl).toFixed(4)}.`,
+      patternType: 'timing',
+    });
+    suggestions.push({
+      category: 'Timing',
+      suggestion: `Consider reducing trading activity during UTC hour ${timing.worstHour}.`,
+      priority: 'low',
+    });
+  }
+
+  if (timing.bestDayOfWeek !== undefined) {
+    const days = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+    ];
+    insights.push({
+      insightType: InsightType.STRENGTH,
+      title: 'Profitable Trading Day',
+      description: `Your most profitable day is ${days[timing.bestDayOfWeek]}.`,
+      patternType: 'timing',
+    });
+  }
+
+  if (holding.lateExits > holding.earlyExits && holding.lateExits > 2) {
+    insights.push({
+      insightType: InsightType.WEAKNESS,
+      title: 'Delayed Exits',
+      description:
+         'You often hold trades too long, which might be turning winners into losers or increasing loss size.',
+      patternType: 'holding_period',
+    });
+    suggestions.push({
+      category: 'Exit Strategy',
+      suggestion: 'Set strict time-based exits or use trailing stops to lock in profits.',
+      priority: 'high',
+    });
+  }
+
   return { insights, suggestions };
 }

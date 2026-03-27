@@ -99,6 +99,14 @@ describe('PatternAnalyzerService', () => {
       expect(patternRepo.save).toHaveBeenCalledTimes(4);
     });
 
+    it('should handle zero trades gracefully', async () => {
+      tradeRepo.find.mockResolvedValue([]);
+      const result = await service.analyze({ userId: 'user-1' });
+      expect(result.patterns).toHaveLength(4);
+      expect(result.insights).toHaveLength(0);
+      expect(result.suggestions).toHaveLength(0);
+    });
+
     it('should save one pattern per type', async () => {
       await service.analyze({ userId: 'user-1' });
       const savedTypes = patternRepo.save.mock.calls.map(
@@ -124,6 +132,20 @@ describe('PatternAnalyzerService', () => {
         expect.objectContaining({ id: 'existing-id' }),
       );
     });
+
+    it('should save insights if patterns are matched', async () => {
+      // Mock trades that will trigger insights in pattern-matcher
+      const winningTrades = Array(10).fill({
+        status: TradeStatus.SETTLED,
+        profitLoss: '100',
+        amount: '10',
+      });
+      tradeRepo.find.mockResolvedValue(winningTrades);
+
+      const result = await service.analyze({ userId: 'user-1' });
+      expect(result.insights.length).toBeGreaterThan(0);
+      expect(insightRepo.save).toHaveBeenCalled();
+    });
   });
 
   describe('getPatterns', () => {
@@ -142,6 +164,9 @@ describe('PatternAnalyzerService', () => {
       insightRepo.find.mockResolvedValue([{ id: 'i1', userId: 'user-1' }]);
       const result = await service.getInsights('user-1');
       expect(result).toHaveLength(1);
+      expect(insightRepo.find).toHaveBeenCalledWith({
+        where: { userId: 'user-1' },
+      });
     });
   });
 });
