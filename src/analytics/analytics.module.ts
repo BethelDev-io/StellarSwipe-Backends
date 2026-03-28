@@ -15,6 +15,11 @@ import { CorrelationService } from './services/correlation.service';
 import { PriceHistory } from '../prices/entities/price-history.entity';
 import { AssetPair } from '../assets/entities/asset-pair.entity';
 import { TradePatternsModule } from './trade-patterns/trade-patterns.module';
+import { LtvCalculatorService } from './ltv/ltv-calculator.service';
+import { LtvController } from './ltv/ltv.controller';
+import { UserLtv } from './ltv/entities/user-ltv.entity';
+import { LtvSegment } from './ltv/entities/ltv-segment.entity';
+import { CalculateLtvJob } from './ltv/jobs/calculate-ltv.job';
 
 @Module({
   imports: [
@@ -25,11 +30,13 @@ import { TradePatternsModule } from './trade-patterns/trade-patterns.module';
       Signal,
       PriceHistory,
       AssetPair,
+      UserLtv,
+      LtvSegment,
     ]),
     ScheduleModule.forRoot(),
     TradePatternsModule,
   ],
-  controllers: [AnalyticsController],
+  controllers: [AnalyticsController, LtvController],
   providers: [
     AnalyticsService,
     RiskMetricsService,
@@ -37,13 +44,16 @@ import { TradePatternsModule } from './trade-patterns/trade-patterns.module';
     AttributionService,
     CorrelationService,
     PriceService,
+    LtvCalculatorService,
+    CalculateLtvJob,
   ],
   exports: [
     AnalyticsService,
     RiskMetricsService,
     AttributionService,
     CorrelationService,
-    StatisticalAnalysisService
+    StatisticalAnalysisService,
+    LtvCalculatorService,
   ],
 })
 export class AnalyticsModule {}
