@@ -13,6 +13,7 @@ import { StellarConfigService } from '../config/stellar.service';
 import { RiskManagerModule } from '../risk/risk-manager.module';
 import { BullModule } from '@nestjs/bull';
 import { WebsocketModule } from '../websocket/websocket.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { TxMonitorService } from './services/tx-monitor.service';
 import { MonitorTransactionsJob } from './jobs/monitor-transactions.job';
 import { PartialCloseService } from './partial-close/partial-close.service';
@@ -25,6 +26,7 @@ import { PartialCloseService } from './partial-close/partial-close.service';
       name: 'transactions',
     }),
     WebsocketModule,
+    NotificationsModule,
   ],
   controllers: [TradesController, AdvancedOrdersController],
   providers: [
@@ -38,7 +40,7 @@ import { PartialCloseService } from './partial-close/partial-close.service';
     IcebergOrderService,
     PartialCloseService,
   ],
-  exports: [TradesService, RiskManagerService, OcoOrderService, IcebergOrderService, PartialCloseService],
+  exports: [TradesService, RiskManagerService, OcoOrderService, IcebergOrderService, PartialCloseService, NotificationsModule],
 })
 export class TradesModule { }
 

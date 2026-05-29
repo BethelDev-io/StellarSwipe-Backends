@@ -13,6 +13,8 @@ import {
 import { RiskManagerService, UserBalance } from './services/risk-manager.service';
 import { TradeExecutorService } from './services/trade-executor.service';
 import { RiskManagerService as VelocityRiskManager } from '../risk/risk-manager.service';
+import { NotificationsService } from '../../notifications/notifications.service';
+import { NotificationType, NotificationChannel } from '../../notifications/entities/notification.entity';
 
 interface SignalData {
   id: string;
@@ -35,10 +37,11 @@ export class TradesService {
     private readonly riskManager: RiskManagerService,
     private readonly tradeExecutor: TradeExecutorService,
     private readonly velocityRiskManager: VelocityRiskManager,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async executeTrade(dto: ExecuteTradeDto): Promise<TradeResultDto> {
-    this.logger.log(`Executing trade for user ${dto.userId}, signal ${dto.signalId}`);
+    this.logger.log(Executing trade for user , signal );
 
     // Check for duplicate trade
     const isDuplicate = await this.riskManager.checkDuplicateTrade(dto.userId, dto.signalId);
@@ -65,7 +68,7 @@ export class TradesService {
     await this.velocityRiskManager.validateTrade(
       {
         userId: dto.userId,
-        asset: `${signalData.baseAsset}/${signalData.counterAsset}`,
+        asset: \\/\\,
         amount: dto.amount,
         entryPrice: parseFloat(signalData.entryPrice),
         stopLossPrice: dto.stopLossPrice,
@@ -116,12 +119,29 @@ export class TradesService {
       // Record trade execution for velocity tracking
       await this.velocityRiskManager.recordTradeExecution({
         userId: trade.userId,
-        asset: `${trade.baseAsset}/${trade.counterAsset}`,
+        asset: \\/\\,
         amount: parseFloat(trade.amount),
         entryPrice: parseFloat(trade.entryPrice),
       });
 
-      this.logger.log(`Trade ${trade.id} executed successfully. Hash: ${trade.transactionHash}`);
+      this.logger.log(\Trade \ executed successfully. Hash: \\);
+
+      // Send trade success notification
+      await this.notificationsService.createAndQueueNotification(
+        trade.userId,
+        NotificationType.TRADE_EXECUTED,
+        'Trade Executed Successfully',
+        \Your trade for \/\ has been executed successfully.\,
+        NotificationChannel.BOTH,
+        {
+          tradeId: trade.id,
+          transactionHash: trade.transactionHash,
+          baseAsset: trade.baseAsset,
+          counterAsset: trade.counterAsset,
+          amount: trade.amount,
+          executedAt: trade.executedAt?.toISOString(),
+        }
+      );
 
       return {
         id: trade.id,
@@ -144,7 +164,24 @@ export class TradesService {
       trade.errorMessage = executionResult.error;
       await this.tradeRepository.save(trade);
 
-      this.logger.error(`Trade ${trade.id} failed: ${executionResult.error}`);
+      this.logger.error(\Trade \ failed: \\);
+
+      // Send trade failure notification
+      await this.notificationsService.createAndQueueNotification(
+        trade.userId,
+        NotificationType.SYSTEM_ALERT,
+        'Trade Execution Failed',
+        \Your trade for \/\ has failed: \\,
+        NotificationChannel.BOTH,
+        {
+          tradeId: trade.id,
+          baseAsset: trade.baseAsset,
+          counterAsset: trade.counterAsset,
+          amount: trade.amount,
+          error: executionResult.error,
+          failedAt: new Date().toISOString(),
+        }
+      );
 
       throw new BadRequestException({
         message: 'Trade execution failed',
@@ -193,7 +230,26 @@ export class TradesService {
         await this.velocityRiskManager.handleTradeLoss(trade.userId, Math.abs(parseFloat(profitLoss)));
       }
 
-      this.logger.log(`Trade ${trade.id} closed. P&L: ${profitLoss} (${profitLossPercentage}%)`);
+      this.logger.log(\Trade \ closed. P&L: \ (\%)\);
+
+      // Send trade closed notification
+      await this.notificationsService.createAndQueueNotification(
+        trade.userId,
+        NotificationType.TRADE_CLOSED,
+        'Trade Closed',
+        \Your trade for \/\ has been closed. P&L: \ (\%)\,
+        NotificationChannel.BOTH,
+        {
+          tradeId: trade.id,
+          baseAsset: trade.baseAsset,
+          counterAsset: trade.counterAsset,
+          amount: trade.amount,
+          profitLoss: trade.profitLoss,
+          profitLossPercentage: trade.profitLossPercentage,
+          exitPrice: exitPrice,
+          closedAt: trade.closedAt?.toISOString(),
+        }
+      );
 
       return {
         id: trade.id,
